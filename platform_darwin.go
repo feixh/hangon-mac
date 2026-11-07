@@ -45,10 +45,12 @@ func (s *nativeStrings) add(text string) *C.char {
 	return value
 }
 
-func (s nativeStrings) free() {
-	for _, value := range s {
+// A pointer receiver lets deferred cleanup see strings added later.
+func (s *nativeStrings) free() {
+	for _, value := range *s {
 		C.free(unsafe.Pointer(value))
 	}
+	*s = nil
 }
 
 func runNativeApp(icon []byte) {
